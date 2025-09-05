@@ -15,7 +15,7 @@ RUN npm install
 RUN npm rebuild sqlite3 --build-from-source
 
 # Stage 2: Runner
-FROM node:18-slim-bullseye
+FROM node:18-slim
 
 WORKDIR /usr/src/app
 
