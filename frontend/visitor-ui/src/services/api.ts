@@ -109,3 +109,10 @@ export const uploadPdf = (file: File) => {
 export const getVisitorMetrics = () => {
     return privateApi.get('/metrics/visitors');
 };
+
+export const downloadPdf = (filePath: string) => {
+    // We use window.location.href to trigger a direct download from the browser
+    // This avoids CORS issues with Axios for file downloads and allows the browser
+    // to handle the Content-Disposition header from the server.
+    window.location.href = `${API_URL}/api/download/pdf?filePath=${encodeURIComponent(filePath)}`;
+};

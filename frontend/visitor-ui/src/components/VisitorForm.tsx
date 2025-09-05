@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Box, Typography, Checkbox, FormControlLabel, CircularProgress, Alert, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material';
-import { validateVisitor, createVisitor, getSettings } from '../services/api';
+import { validateVisitor, createVisitor, getSettings, downloadPdf } from '../services/api';
 
 interface VisitorFormData {
   [key: string]: string;
@@ -97,20 +97,24 @@ const VisitorForm = () => {
       const response = await createVisitor(formData);
       setSuccess(`Kayıt başarılı! Hoş geldiniz, ${response.data.first_name}.`);
 
+      // Download PDF
+      console.log('PDF Yolu:', visitorPdfPath);
+      // Download PDF via hidden iframe
       if (visitorPdfPath) {
-        const link = document.createElement('a');
-        link.href = visitorPdfPath;
-        link.setAttribute('download', ''); // Or a specific filename
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const API_URL = import.meta.env.VITE_API_URL;
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none'; // Hide the iframe
+        iframe.src = `${API_URL}/api/download/pdf?filePath=${encodeURIComponent(visitorPdfPath)}`;
+        document.body.appendChild(iframe);
+        // Optional: Remove iframe after a short delay
+        setTimeout(() => {
+          document.body.removeChild(iframe);
+        }, 5000); // Remove after 5 seconds
       }
 
       // Redirect
       if (redirectUrl) {
-        setTimeout(() => {
-          window.location.href = redirectUrl;
-        }, 1000); // Delay to allow download to start
+        window.location.href = redirectUrl;
       }
 
       // Reset form

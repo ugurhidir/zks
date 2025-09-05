@@ -47,7 +47,7 @@ const limiter = rateLimit({
 });
 
 app.use(limiter);
-app.use(cors());
+app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -342,6 +342,32 @@ app.post('/api/upload/pdf', authenticateToken, isAdmin, upload.single('pdf'), (r
     });
 });
 
+// PDF Download Endpoint (forces download)
+app.get('/api/download/pdf', (req, res) => {
+    const filePath = req.query.filePath; // Expects a path like /uploads/filename.pdf
+    if (!filePath) {
+        return res.status(400).json({ message: 'File path is required.' });
+    }
+
+    const absolutePath = path.join(__dirname, filePath);
+
+    // Ensure the file is within the uploads directory for security
+    if (!absolutePath.startsWith(uploadsDir)) {
+        return res.status(403).json({ message: 'Access denied.' });
+    }
+
+    res.download(absolutePath, (err) => {
+        if (err) {
+            console.error('Error downloading file:', err);
+            if (err.code === 'ENOENT') {
+                res.status(404).json({ message: 'File not found.' });
+            } else {
+                res.status(500).json({ message: 'Error serving file.' });
+            }
+        }
+    });
+});
+
 // Get all users
 app.get('/api/users', authenticateToken, isAdmin, (req, res) => {
     let { search, role, page, limit } = req.query;
@@ -596,4 +622,8 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Sunucu 0.0.0.0:${PORT} adresinde dinleniyor`);
+});
+
+process.on('exit', code => {
+  console.log(`Process exited with code: ${code}`);
 });
