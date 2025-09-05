@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: visitor-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    ports:
+      - "3001:3001"
+    networks:
+      - visitor-net
+
+  frontend:
+    build: ./frontend/visitor-ui
+    container_name: visitor-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80" # Map host port 5173 to container port 80 (Nginx)
+    depends_on:
+      - backend
+    networks:
+      - visitor-net
+
+networks:
+  visitor-net:
+    driver: bridge
