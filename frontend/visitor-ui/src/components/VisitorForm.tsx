@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Box, Typography, Checkbox, FormControlLabel, CircularProgress, Alert, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material';
-import { validateVisitor, createVisitor, getSettings, downloadPdf } from '../services/api';
+import { validateVisitor, createVisitor, getSettings } from '../services/api';
 
 interface VisitorFormData {
   [key: string]: string;
