@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install app dependencies
-RUN apt-get update && apt-get install -y build-essential python make
+RUN apt-get update && apt-get install -y build-essential python3 make --no-install-recommends && rm -rf /var/lib/apt/lists/*
 RUN rm -rf node_modules package-lock.json
 RUN npm install
 RUN npm rebuild sqlite3 --build-from-source
