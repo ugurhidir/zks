@@ -8,8 +8,9 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install app dependencies
+RUN rm -rf node_modules package-lock.json
 RUN npm install
-RUN npm rebuild
+RUN npm rebuild sqlite3 --build-from-source
 
 # Bundle app source
 COPY . .
