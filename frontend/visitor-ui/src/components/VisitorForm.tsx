@@ -22,6 +22,8 @@ const VisitorForm = () => {
   });
   const [kvkkText, setKvkkText] = useState('');
   const [aydinlatmaText, setAydinlatmaText] = useState('');
+  const [visitorPdfPath, setVisitorPdfPath] = useState<string | null>(null);
+  const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
   const [kvkkChecked, setKvkkChecked] = useState(false);
   const [aydinlatmaChecked, setAydinlatmaChecked] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -30,17 +32,19 @@ const VisitorForm = () => {
   const [tcKimlikError, setTcKimlikError] = useState<string | null>(null); // New state for TC Kimlik error
 
   useEffect(() => {
-    const fetchTexts = async () => {
+    const fetchSettings = async () => {
       try {
         const response = await getSettings();
         setKvkkText(response.data.kvkk_text || 'KVKK metni yüklenemedi.');
         setAydinlatmaText(response.data.aydinlatma_text || 'Kurumsal Aydınlatma metni yüklenemedi.');
+        setVisitorPdfPath(response.data.visitor_pdf_path || null);
+        setRedirectUrl(response.data.redirect_url || null);
       } catch (err) {
         console.error('Ayarlar yüklenirken hata:', err);
         setError('Aydınlatma metinleri yüklenirken bir hata oluştu.');
       }
     };
-    fetchTexts();
+    fetchSettings();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -92,6 +96,24 @@ const VisitorForm = () => {
       // Step 2: If validation is successful, register the visitor
       const response = await createVisitor(formData);
       setSuccess(`Kayıt başarılı! Hoş geldiniz, ${response.data.first_name}.`);
+
+      // Download PDF
+      if (visitorPdfPath) {
+        const link = document.createElement('a');
+        link.href = visitorPdfPath;
+        link.setAttribute('download', ''); // Or a specific filename
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      // Redirect
+      if (redirectUrl) {
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 1000); // Delay to allow download to start
+      }
+
       // Reset form
       setFormData({ tc_kimlik: '', first_name: '', last_name: '', birth_year: '', reason_for_visit: '' });
       setKvkkChecked(false);

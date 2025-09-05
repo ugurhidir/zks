@@ -5,7 +5,7 @@ import {
 import { getSettings, updateSettings } from '../services/api';
 
 const SettingsPanel = () => {
-  const [settings, setSettings] = useState({ kvkk_text: '', aydinlatma_text: '' });
+  const [settings, setSettings] = useState({ kvkk_text: '', aydinlatma_text: '', visitor_pdf_path: '', redirect_url: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -51,13 +51,31 @@ const SettingsPanel = () => {
     <Container maxWidth="lg" sx={{ mt: 4 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h5" component="h2" sx={{ mb: 3 }}>
-          Metin Ayarları
+          Metin ve Yönlendirme Ayarları
         </Typography>
 
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
         <Box component="form" noValidate autoComplete="off">
+          <TextField
+            name="visitor_pdf_path"
+            label="İndirilecek PDF Dosyasının URL'si"
+            fullWidth
+            variant="outlined"
+            value={settings.visitor_pdf_path}
+            onChange={handleChange}
+            sx={{ mb: 3 }}
+          />
+          <TextField
+            name="redirect_url"
+            label="Yönlendirilecek URL"
+            fullWidth
+            variant="outlined"
+            value={settings.redirect_url}
+            onChange={handleChange}
+            sx={{ mb: 3 }}
+          />
           <TextField
             name="kvkk_text"
             label="KVKK Metni"

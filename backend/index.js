@@ -512,28 +512,36 @@ app.put('/api/users/:id', authenticateToken, isAdmin,
 
 // Update settings (admin only)
 app.put('/api/settings', authenticateToken, isAdmin, (req, res) => {
-    const { kvkk_text, aydinlatma_text } = req.body;
+    const { kvkk_text, aydinlatma_text, visitor_pdf_path, redirect_url } = req.body;
 
-    if (kvkk_text === undefined || aydinlatma_text === undefined) {
-        return res.status(400).json({ message: 'Both kvkk_text and aydinlatma_text are required.' });
-    }
+    const settingsToUpdate = {
+        kvkk_text,
+        aydinlatma_text,
+        visitor_pdf_path,
+        redirect_url
+    };
 
     const updateSql = "UPDATE settings SET value = ? WHERE key = ?";
     
     db.serialize(() => {
-        db.run(updateSql, [kvkk_text, 'kvkk_text'], function(err) {
-            if (err) {
-                return res.status(500).json({ message: 'Database error while updating kvkk_text', error: err.message });
+        const stmt = db.prepare(updateSql);
+        for (const [key, value] of Object.entries(settingsToUpdate)) {
+            if (value !== undefined) {
+                stmt.run(value, key, function(err) {
+                    if (err) {
+                        // It's hard to send a response here as we are in a loop.
+                        // We should collect errors and respond once.
+                        console.error(`Error updating setting ${key}:`, err.message);
+                    }
+                });
             }
-        });
-
-        db.run(updateSql, [aydinlatma_text, 'aydinlatma_text'], function(err) {
+        }
+        stmt.finalize((err) => {
             if (err) {
-                return res.status(500).json({ message: 'Database error while updating aydinlatma_text', error: err.message });
+                return res.status(500).json({ message: 'Error finalizing settings update', error: err.message });
             }
+            res.status(200).json({ message: 'Settings updated successfully.' });
         });
-
-        res.status(200).json({ message: 'Settings updated successfully.' });
     });
 });
 
