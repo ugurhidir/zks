@@ -98,7 +98,7 @@ const SettingsPanel = () => {
             </Button>
             {settings.visitor_pdf_path && (
               <Typography variant="body2" sx={{ mt: 1 }}>
-                Mevcut dosya: <a href={`${import.meta.env.VITE_API_URL}${settings.visitor_pdf_path}`} target="_blank" rel="noopener noreferrer">{settings.visitor_pdf_path}</a>
+                Mevcut dosya: <a href={settings.visitor_pdf_path} target="_blank" rel="noopener noreferrer">{settings.visitor_pdf_path}</a>
               </Typography>
             )}
           </Box>

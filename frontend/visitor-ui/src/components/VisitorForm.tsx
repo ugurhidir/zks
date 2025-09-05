@@ -97,11 +97,9 @@ const VisitorForm = () => {
       const response = await createVisitor(formData);
       setSuccess(`Kayıt başarılı! Hoş geldiniz, ${response.data.first_name}.`);
 
-      const API_URL = import.meta.env.VITE_API_URL || `http://${window.location.hostname}:3001`;
-      // Download PDF
       if (visitorPdfPath) {
         const link = document.createElement('a');
-        link.href = `${API_URL}${visitorPdfPath}`;
+        link.href = visitorPdfPath;
         link.setAttribute('download', ''); // Or a specific filename
         document.body.appendChild(link);
         link.click();
