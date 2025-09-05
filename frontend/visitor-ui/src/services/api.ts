@@ -95,6 +95,16 @@ export const updateSettings = (settingsData:any) => {
     return privateApi.put('/settings', settingsData);
 };
 
+export const uploadPdf = (file: File) => {
+    const formData = new FormData();
+    formData.append('pdf', file);
+    return privateApi.post('/upload/pdf', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+};
+
 // --- Metrics APIs ---
 export const getVisitorMetrics = () => {
     return privateApi.get('/metrics/visitors');

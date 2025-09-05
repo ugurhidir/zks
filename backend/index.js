@@ -7,6 +7,9 @@ const { body, validationResult } = require('express-validator');
 const rateLimit = require('express-rate-limit');
 const db = require('./database.js');
 const bcrypt = require('bcrypt');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = 3001;
@@ -17,6 +20,23 @@ if (!JWT_SECRET) {
     console.error("FATAL ERROR: JWT_SECRET is not defined.");
     process.exit(1);
 }
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir);
+}
+
+// Multer configuration
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+const upload = multer({ storage: storage });
 
 // Rate limiting
 const limiter = rateLimit({
@@ -29,6 +49,7 @@ const limiter = rateLimit({
 app.use(limiter);
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // --- AUTHENTICATION ---
 
@@ -304,6 +325,22 @@ app.get('/api/metrics/visitors', authenticateToken, (req, res) => {
 
 
 // --- ADMIN API Endpoints (Admin Role Required) ---
+
+// PDF Upload Endpoint
+app.post('/api/upload/pdf', authenticateToken, isAdmin, upload.single('pdf'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded.' });
+    }
+    const pdfPath = `/uploads/${req.file.filename}`;
+    // Now update the settings in the database
+    const updateSql = "UPDATE settings SET value = ? WHERE key = ?";
+    db.run(updateSql, [pdfPath, 'visitor_pdf_path'], function(err) {
+        if (err) {
+            return res.status(500).json({ message: 'Database error while updating pdf path', error: err.message });
+        }
+        res.status(200).json({ message: 'File uploaded and path saved successfully.', filePath: pdfPath });
+    });
+});
 
 // Get all users
 app.get('/api/users', authenticateToken, isAdmin, (req, res) => {
