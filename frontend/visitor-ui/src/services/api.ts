@@ -41,18 +41,18 @@ privateApi.interceptors.response.use(
 );
 
 // --- Authentication APIs ---
-export const login = async (username, password) => {
+export const login = async (username:string, password:string) => {
     // We use the public endpoint for login
     const response = await publicApi.post('/login', { username, password });
     return response.data;
 };
 
 // --- Public Visitor APIs ---
-export const validateVisitor = (visitorData) => {
+export const validateVisitor = (visitorData:any) => {
     return publicApi.post('/validate', visitorData);
 };
 
-export const createVisitor = (visitorData) => {
+export const createVisitor = (visitorData:any) => {
     return publicApi.post('/visitors', visitorData);
 };
 
@@ -65,7 +65,7 @@ export const getPastVisitors = () => {
     return privateApi.get('/visitors/past');
 };
 
-export const deactivateVisitor = (id) => {
+export const deactivateVisitor = (id:string | number) => {
     return privateApi.put(`/visitors/${id}/deactivate`);
 };
 
@@ -74,15 +74,15 @@ export const getUsers = (params?: { search?: string; role?: string; page?: numbe
     return privateApi.get('/users', { params });
 };
 
-export const createUser = (userData) => {
+export const createUser = (userData:any) => {
     return privateApi.post('/users', userData);
 };
 
-export const deleteUser = (id) => {
+export const deleteUser = (id:string | number) => {
     return privateApi.delete(`/users/${id}`);
 };
 
-export const updateUser = (id, userData) => {
+export const updateUser = (id:string | number, userData:any) => {
     return privateApi.put(`/users/${id}`, userData);
 };
 
@@ -91,7 +91,7 @@ export const getSettings = () => {
     return publicApi.get('/settings');
 };
 
-export const updateSettings = (settingsData) => {
+export const updateSettings = (settingsData:any) => {
     return privateApi.put('/settings', settingsData);
 };
 

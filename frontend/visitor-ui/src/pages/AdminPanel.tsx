@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Tabs, Tab, Container } from '@mui/material';
 import { Link, useLocation, Outlet } from 'react-router-dom';
 

@@ -3,8 +3,9 @@ import {
   Box, Typography, Paper, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Button, CircularProgress, Alert, IconButton,
   Dialog, DialogActions, DialogContent, DialogTitle, TextField, Select, MenuItem, FormControl, InputLabel, Container,
-  TablePagination // Import TablePagination
+  TablePagination
 } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material';
 import { getUsers, createUser, deleteUser, updateUser } from '../services/api';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -25,7 +26,7 @@ const UserManagementPanel = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [formUser, setFormUser] = useState({ username: '', password: '', role: 'staff' });
+  const [formUser, setFormUser] = useState({ username: '', password: '', role: 'staff' as 'admin' | 'staff' });
 
   // State for search, filter, and pagination
   const [searchQuery, setSearchQuery] = useState('');
@@ -117,8 +118,8 @@ const UserManagementPanel = () => {
     setFormUser(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleRoleChange = (e: any) => {
-    setFormUser(prev => ({ ...prev, role: e.target.value }));
+  const handleRoleChange = (e: SelectChangeEvent<string>) => {
+    setFormUser(prev => ({ ...prev, role: e.target.value as 'admin' | 'staff' }));
   };
   
   const formatDateTime = (isoString: string) => {
@@ -126,7 +127,7 @@ const UserManagementPanel = () => {
   }
 
   // Pagination handlers
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 

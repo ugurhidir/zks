@@ -20,6 +20,12 @@ interface Visitor {
   is_active: boolean;
 }
 
+interface VisitorMetrics {
+  visitorsToday: number;
+  activeVisitors: number;
+  averageVisitDurationMinutes: number;
+}
+
 const StaffPanel = () => {
   const [view, setView] = useState('active');
   const [activeVisitors, setActiveVisitors] = useState<Visitor[]>([]);
@@ -28,7 +34,7 @@ const StaffPanel = () => {
   const [error, setError] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedVisitorId, setSelectedVisitorId] = useState<string | null>(null);
-  const [metrics, setMetrics] = useState(null); // State for metrics
+  const [metrics, setMetrics] = useState<VisitorMetrics | null>(null); // State for metrics
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -76,7 +82,7 @@ const StaffPanel = () => {
     }
   };
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
     setView(newValue);
   };
 

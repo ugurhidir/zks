@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Box, Typography, Checkbox, FormControlLabel, CircularProgress, Alert, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material';
 import { validateVisitor, createVisitor, getSettings } from '../services/api';
 
+interface VisitorFormData {
+  [key: string]: string;
+  tc_kimlik: string;
+  first_name: string;
+  last_name: string;
+  birth_year: string;
+  reason_for_visit: string;
+}
+
 const VisitorForm = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<VisitorFormData>({
     tc_kimlik: '',
     first_name: '',
     last_name: '',
@@ -33,7 +43,7 @@ const VisitorForm = () => {
     fetchTexts();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => { // Updated type for select
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
 
     if (name === 'tc_kimlik') {
@@ -49,6 +59,11 @@ const VisitorForm = () => {
     } else {
       setFormData({ ...formData, [name]: value });
     }
+  };
+
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -126,7 +141,7 @@ const VisitorForm = () => {
             name="birth_year"
             value={formData.birth_year}
             label="Doğum Yılı"
-            onChange={handleChange}
+            onChange={handleSelectChange}
           >
             {years.map((year) => (
               <MenuItem key={year} value={year}>
