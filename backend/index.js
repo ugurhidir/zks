@@ -131,17 +131,26 @@ app.post('/api/validate',
 
 // Get all settings (public)
 app.get('/api/settings', (req, res) => {
+    const defaultSettings = {
+        kvkk_text: '',
+        aydinlatma_text: '',
+        visitor_pdf_path: '',
+        redirect_url: ''
+    };
+
     const sql = "SELECT key, value FROM settings";
     db.all(sql, [], (err, rows) => {
         if (err) {
             return res.status(500).json({ message: 'Database error', error: err.message });
         }
-        // Convert rows to a key-value object
-        const settings = rows.reduce((acc, row) => {
+        
+        const dbSettings = rows.reduce((acc, row) => {
             acc[row.key] = row.value;
             return acc;
         }, {});
-        res.status(200).json(settings);
+
+        const finalSettings = { ...defaultSettings, ...dbSettings };
+        res.status(200).json(finalSettings);
     });
 });
 
@@ -332,14 +341,7 @@ app.post('/api/upload/pdf', authenticateToken, isAdmin, upload.single('pdf'), (r
         return res.status(400).json({ message: 'No file uploaded.' });
     }
     const pdfPath = `/uploads/${req.file.filename}`;
-    // Now update the settings in the database
-    const updateSql = "UPDATE settings SET value = ? WHERE key = ?";
-    db.run(updateSql, [pdfPath, 'visitor_pdf_path'], function(err) {
-        if (err) {
-            return res.status(500).json({ message: 'Database error while updating pdf path', error: err.message });
-        }
-        res.status(200).json({ message: 'File uploaded and path saved successfully.', filePath: pdfPath });
-    });
+    res.status(200).json({ message: 'File uploaded successfully.', filePath: pdfPath });
 });
 
 // PDF Download Endpoint (forces download)
